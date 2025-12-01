@@ -83,45 +83,29 @@
   </body>
 
   <script>
-    let comprobarId = () => {
-      console.log("Comprobando id");
-      let pattern = "^\d{1,2}$";
-      let id = document.getElementById("id");
-      console.log(id);
-      let error = document.getElementById("error");
-      error.innerHTML = "";
-      console.log(error);
 
-      if (id.validity.patternMismatch) {
-        span.textContent = mensajeFormato;
-        return false;
-      }
-      return id.value;
-    };
+    //Paginacion de todos los datos
+   const cargarDatos = async() =>{
+    try{
+        let response = await fetch("https://www.swapi.tech/api/people/");
+        let paginas = response.total_pages;
+    }catch (error){
+        console.error("Datos no cargados");
+    }
 
-    document.getElementById("enviar").addEventListener("click", (event) => {
-      event.preventDefault();
-      let id = comprobarId();
-      console.log(id);
-      if (!isNaN(id)) {
-        buscarPersonaje(id);
-      }
-    });
+    for(let i = 1; i<=paginas; i++){
+        response = await fetch(`https://www.swapi.tech/api/people?page=${i}&limit=10`)
+        datos = await response.json()
+        personajes.push(...datos.Search) //cambiar a results si falla
+    }
 
-    const buscarPersonaje = async (id) => {
-      console.log(`buscando personaje con id ${id}`);
-      let personaje;
-      let data;
-      try {
-        data = await fetch(`https://www.swapi.tech/api/people/${id}`);
+    console.log("datos cargados")
+    mostrarPersonajes()
+}
 
-        
-      } catch (error) {
-        console.error("Personaje no encontrado");
-      }
-      personaje = await data.json();
-      console.log(personaje);
-        let personajeDOM = document.getElementById("personaje");
+const mostrarPersonajes = ()=>{
+    let personajesDOM = document.getElementById("personajes");
+    personajes.forEach( p=>{;
         personajeDOM.classList.add("card");
         personajeDOM.style.display="flex" //tengo que hacer esto porq no entiendo muy bien la estructura css
         personajeDOM.innerHTML = `<div>
@@ -130,6 +114,7 @@
     <p>Masa -> ${personaje.result.properties.mass}</p>
     <p>Genero -> ${personaje.result.properties.gender}</p>
     </div>`;
-    };
+    })
+}
   </script>
 </html>
